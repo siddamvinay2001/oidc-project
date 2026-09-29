@@ -1,4 +1,10 @@
+import fs from 'fs'
+import { findAccount } from '../service/authenticate.js';
+
+const jwks = JSON.parse(fs.readFileSync('keys/jwks.json', 'utf8'));
+
 export default {
+
   clients: [
     {
       client_id: "vin-client-1",
@@ -7,6 +13,9 @@ export default {
       redirect_uris: ["https://oidcdebugger.com/debug"],
     },
   ],
+
+  jwks: jwks,
+
   claims: {
     opeid: ["sub"],
     email: ["email"],
@@ -16,5 +25,17 @@ export default {
     url(ctx, interaction){
         return '/interaction/' + interaction.uid;
     }
-  }
+  },
+
+   features: {
+    devInteractions: { enabled: false },
+    userinfo: { enabled: true },
+  },
+
+  findAccount: findAccount,
+
+   cookies:{
+    keys: ['oidc-cookie']
+   }
+
 };

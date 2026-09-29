@@ -15,3 +15,21 @@ export async function authenticate(username, password) {
         return null;
     return user;
 }
+
+export async function findAccount(ctx, id){
+    const user = users.find((u) => u.id === id);
+    if(!user){
+        return undefined;
+    }
+
+    return {
+        accountId: user.id,
+        async claims(){
+            return{
+                sub: user.id,
+                email: user.email,
+                name: user.name
+            }
+        }
+    }
+}

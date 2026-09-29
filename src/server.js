@@ -8,9 +8,7 @@ const { PORT = 3000, ISSUER = ISSUER_URL + `:${PORT}` } = process.env;
 
 const app = express();
 
-export const provider = new oidc.Provider(ISSUER, {
-  configuration,
-});
+export const provider = new oidc.Provider(ISSUER, configuration);
 
 app.use('/interaction', interactionRoutes);
 
