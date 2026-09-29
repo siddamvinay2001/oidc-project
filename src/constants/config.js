@@ -1,10 +1,12 @@
-import fs from 'fs'
-import { findAccount } from '../service/authenticate.js';
+import fs from "fs";
+import { findAccount } from "../service/authenticate.js";
 
-const jwks = JSON.parse(fs.readFileSync('keys/jwks.json', 'utf8'));
+const jwks = JSON.parse(fs.readFileSync("keys/jwks.json", "utf8"));
+const cookieKeys = process.env.COOKIES
+  ? process.env.COOKIES.split(",")
+  : ["cookie-keys"];
 
 export default {
-
   clients: [
     {
       client_id: "vin-client-1",
@@ -21,21 +23,19 @@ export default {
     email: ["email"],
     profile: ["name"],
   },
-  interactions:{
-    url(ctx, interaction){
-        return '/interaction/' + interaction.uid;
-    }
+  interactions: {
+    url(ctx, interaction) {
+      return "/interaction/" + interaction.uid;
+    },
   },
 
-   features: {
+  features: {
     devInteractions: { enabled: false },
     userinfo: { enabled: true },
   },
 
-  findAccount: findAccount,
-
-   cookies:{
-    keys: ['oidc-cookie']
-   }
-
+  findAccount,
+  cookies: {
+    keys: cookieKeys
+  },
 };
