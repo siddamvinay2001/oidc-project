@@ -9,7 +9,7 @@ const users = [
 ]
 
 
-export async function authenticate(username, password) {
+export function authenticate(username, password) {
     const user = users.find((user)=> user.username === username && user.password === password);
     if(!user)
         return null;

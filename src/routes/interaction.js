@@ -8,6 +8,7 @@ router.use(express.urlencoded({ extended: true }));
 
 router.get("/:uid", async (req, res, next) => {
   try {
+    debugger;
     const details = await provider.interactionDetails(req, res);
     if (details.prompt.name === "login") {
       res.send(loginPage(details.uid));
@@ -23,6 +24,7 @@ router.get("/:uid", async (req, res, next) => {
 
 router.post("/:uid/login", async (req, res, next) => {
   try {
+    debugger;
     const details = await provider.interactionDetails(req, res);
     const user = authenticate(req.body.username, req.body.password);
     if (!user) {
@@ -50,7 +52,7 @@ router.post("/:uid/login", async (req, res, next) => {
   }
 });
 
-router.post("/interaction/:uid/confirm", async (req, res, next) => {
+router.post("/:uid/confirm", async (req, res, next) => {
   try {
     const details = await provider.interactionDetails(req, res);
     const accountId = details.session.accountId;

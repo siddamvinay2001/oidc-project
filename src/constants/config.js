@@ -17,7 +17,7 @@ export default {
   jwks: jwks,
 
   claims: {
-    opeid: ["sub"],
+    openid: ["sub"],
     email: ["email"],
     profile: ["name"],
   },

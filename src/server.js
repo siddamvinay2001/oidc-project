@@ -9,12 +9,15 @@ const { PORT = 3000, ISSUER = ISSUER_URL + `:${PORT}` } = process.env;
 const app = express();
 
 export const provider = new oidc.Provider(ISSUER, configuration);
+provider.on('grant.error', (ctx,err)=>{
+    console.error(JSON.parse(err))
+})
 
 app.use('/interaction', interactionRoutes);
 
 app.use(provider.callback());
 
-app.use((err,req,res)=>{
+app.use((err,req,res,next)=>{
     console.error(err);
     return res.status(err.statusCode || err.status || 500).send(
         `<h2>Something went wrong internally <p> ${JSON.stringify(err)} </p></h2>`

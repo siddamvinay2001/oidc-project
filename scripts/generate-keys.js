@@ -10,7 +10,7 @@ if (fs.existsSync(FILE)) {
 
 const {privateKey} = crypto.generateKeyPairSync('rsa', {modulusLength: 2048});
 
-const jwk = privateKey.export({format: jwk});
+const jwk = privateKey.export({format: 'jwk'});
 jwk.kid = 'key-' + (keys.length+1);
 jwk.alg = 'RS256';
 jwk.use = 'sig';
