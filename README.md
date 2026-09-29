@@ -6,6 +6,7 @@ Authorization Code Flow, issues an signed ID Token, exposes Discovery and
 JWKS, and the ID Token can be verified on [jwt.io](https://www.jwt.io/).
 
 ## Architecture
+<img src="docs/architecture.png" alt="Authorization Code Flow" width="800">
 
 ## Requirements
 
