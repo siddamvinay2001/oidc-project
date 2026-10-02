@@ -61,6 +61,7 @@ export default function createInteractionRoutes(provider) {
       const accountId = details.session.accountId;
       const clientId = details.params.client_id;
       const missingOIDCScope = details.prompt.details.missingOIDCScope;
+      const missingResourceScopes = details.prompt.details.missingResourceScopes;
 
       let grant;
       if (details.grantId) {
@@ -70,6 +71,12 @@ export default function createInteractionRoutes(provider) {
         grant = new provider.Grant({ accountId, clientId });
       }
 
+      
+      if (missingResourceScopes) {
+        for (const [resource, scopes] of Object.entries(missingResourceScopes)) {
+          grant.addResourceScope(resource, scopes.join(" "));
+        }
+      }
       if (missingOIDCScope) {
         grant.addOIDCScope(missingOIDCScope.join(" "));
       }
