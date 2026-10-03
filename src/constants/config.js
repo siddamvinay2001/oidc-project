@@ -3,9 +3,11 @@ import { findAccount } from "../service/authenticate.js";
 import { errors } from "oidc-provider";
 
 const jwks = JSON.parse(fs.readFileSync("keys/jwks.json", "utf8"));
+
 const cookieKeys = process.env.COOKIES
   ? process.env.COOKIES.split(",")
   : ["cookie-keys"];
+
 const RESOURCE_SERVERS = {
   "http://localhost:3000/orders": {
     audience: "http://localhost:3000/orders",

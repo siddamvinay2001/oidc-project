@@ -14,7 +14,7 @@ export default function billingRoutes(issuer) {
     try {
       const { payload } = await jwtVerify(token, jwks, {
         issuer: issuer,
-        audience: 'http://localhost:3000/billing',
+        audience: issuer + "/billing",
         typ: "at+jwt",
       });
 
@@ -23,7 +23,7 @@ export default function billingRoutes(issuer) {
         return res.status(403).json({ error: "insufficient_scope" });
       }
 
-       res.json({
+      res.json({
         api: "billing",
         user: payload.sub,
         client: payload.client_id,

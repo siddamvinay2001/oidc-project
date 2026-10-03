@@ -14,7 +14,7 @@ export default function ordersRoutes(issuer) {
     try {
       const { payload } = await jwtVerify(token, jwks, {
         issuer: issuer,
-        audience: 'http://localhost:3000/orders',
+        audience: issuer + "/orders",
         typ: "at+jwt",
       });
 

@@ -10,7 +10,7 @@ const users = [
 
 export function authenticate(username, password) {
   const user = users.find(
-    (user) => user.username === username && user.password === password
+    (user) => user.username === username && user.password === password,
   );
   if (!user) return null;
   return user;

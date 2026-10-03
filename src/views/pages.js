@@ -1,19 +1,19 @@
 function escapeHtml(value) {
   return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 export function loginPage(uid, error) {
   return `
-    <h2>Sign in</h2></n>
-    ${error ? `<p style="color:red">${escapeHtml(error)}</p>` : ''}</n>
+    <h2>Sign in</h2>
+    ${error ? `<p style="color:red">${escapeHtml(error)}</p>` : ""}
     <form method="post" action="/interaction/${uid}/login">
-      <p><input name="username" placeholder="username" autofocus></p></n>
-      <p><input name="password" type="password" placeholder="password"></p></n>
+      <p><input name="username" placeholder="username" autofocus></p>
+      <p><input name="password" type="password" placeholder="password"></p>
       <button type="submit">Sign in</button>
     </form>
   `;
@@ -21,10 +21,10 @@ export function loginPage(uid, error) {
 
 export function consentPage(uid, clientId, scope) {
   return `
-    <h2>Allow access</h2></n>
-    <p><b>${escapeHtml(clientId)}</b> wants access to: ${escapeHtml(scope)}</p></n>
+    <h2>Allow access</h2>
+    <p><b>${escapeHtml(clientId)}</b> wants access to: ${escapeHtml(scope)}</p>
     <form method="post" action="/interaction/${uid}/confirm">
-      <button type="submit">Allow</button></n>
+      <button type="submit">Allow</button>
     </form>
   `;
 }
