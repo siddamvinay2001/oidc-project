@@ -23,11 +23,14 @@ cp .env.example .env      # then set COOKIES to a random value
 npm start
 ```
 
-| Variable     | Purpose                             | Example                 |
-| ------------ | ----------------------------------- | ----------------------- |
-| `PORT`       | Port to listen on                   | `3000`                  |
-| `ISSUER_URL` | Issuer base URL (port is appended)  | `http://localhost`      |
-| `COOKIES`    | Comma-separated cookie signing keys | `randomKey1,randomKey2` |
+| Variable       | Purpose                                                            | Example                          |
+| -------------- | ------------------------------------------------------------------ | -------------------------------- |
+| `PORT`         | Port to listen on                                                  | `3000`                           |
+| `ISSUER_URL`   | Issuer base URL (port is appended)                                 | `http://localhost`               |
+| `COOKIES`      | Comma-separated cookie signing keys                                | `randomKey1,randomKey2`          |
+| `REDIRECT_URI` | Client redirect URI (defaults to `https://oidcdebugger.com/debug`) | `https://oidcdebugger.com/debug` |
+
+The issuer, endpoints and resource URLs below follow `ISSUER_URL` and `PORT`. They are shown with the defaults.
 
 ## Endpoints
 
@@ -51,7 +54,7 @@ npm start
 | --------------- | ----------------------------------------------------------------------------- |
 | `client_id`     | `vin-client-1`                                                                |
 | `client_secret` | `vin-secret-1`                                                                |
-| `redirect_uri`  | `https://oidcdebugger.com/debug`                                              |
+| `redirect_uri`  | `https://oidcdebugger.com/debug` (override with `REDIRECT_URI`)               |
 | `grant_types`   | `authorization_code`, `refresh_token`                                         |
 | Scopes          | `openid`, `email`, `profile`, `offline_access`, `orders:read`, `billing:read` |
 

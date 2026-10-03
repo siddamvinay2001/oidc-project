@@ -4,20 +4,23 @@ import { errors } from "oidc-provider";
 
 const jwks = JSON.parse(fs.readFileSync("keys/jwks.json", "utf8"));
 
+const ISSUER_URL = process.env.ISSUER_URL || "http://localhost";
+export const { PORT = 3000, ISSUER = ISSUER_URL + `:${PORT}` } = process.env;
+
 const cookieKeys = process.env.COOKIES
   ? process.env.COOKIES.split(",")
   : ["cookie-keys"];
 
 const RESOURCE_SERVERS = {
-  "http://localhost:3000/orders": {
-    audience: "http://localhost:3000/orders",
+  [ISSUER + "/orders"]: {
+    audience: ISSUER + "/orders",
     scope: "orders:read",
     accessTokenFormat: "jwt",
     accessTokenTTL: 3600,
     jwt: { sign: { alg: "RS256" } },
   },
-  "http://localhost:3000/billing": {
-    audience: "http://localhost:3000/billing",
+  [ISSUER + "/billing"]: {
+    audience: ISSUER + "/billing",
     scope: "billing:read",
     accessTokenFormat: "jwt",
     accessTokenTTL: 600,
@@ -31,7 +34,9 @@ export default {
       client_id: "vin-client-1",
       client_secret: "vin-secret-1",
       grant_types: ["refresh_token", "authorization_code"],
-      redirect_uris: ["https://oidcdebugger.com/debug"],
+      redirect_uris: [
+        process.env.REDIRECT_URI || "https://oidcdebugger.com/debug",
+      ],
     },
   ],
 
