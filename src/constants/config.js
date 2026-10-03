@@ -34,6 +34,7 @@ export default {
   ],
 
   jwks: jwks,
+  // rotateRefreshToken: true, rotate every refresh call
 
   claims: {
     openid: ["sub"],
