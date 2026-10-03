@@ -34,7 +34,7 @@ export default function createInteractionRoutes(provider) {
         return res.send(
           loginPage(
             details.uid,
-            "User does not exits in our database, please enter valid username and password"
+            "User does not exists in our database, please enter valid username and password"
           )
         );
       }

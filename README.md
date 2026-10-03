@@ -1,85 +1,63 @@
 # Node.js OIDC Identity Provider
 
-A small OpenID Connect Identity Provider built with Node.js, Express and
-[oidc-provider](https://github.com/panva/node-oidc-provider). It supports the
-Authorization Code Flow, issues an signed ID Token, exposes Discovery and
-JWKS, and the ID Token can be verified on [jwt.io](https://www.jwt.io/).
+An OpenID Connect Identity Provider built with Node.js, Express and
+[oidc-provider](https://github.com/panva/node-oidc-provider).
+
+It implements the Authorization Code Flow with a custom login and consent UI,
+issues RS256-signed ID Tokens, exposes Discovery and JWKS, issues refresh tokens,
+supports signing key rotation, and issues JWT access tokens for two demo APIs
+(`/orders` and `/billing`) using Resource Indicators (RFC 8707).
 
 ## Architecture
+
 <img src="docs/architecture.png" alt="Authorization Code Flow" width="800">
-
-## Requirements
-
-- Node.js 20.6 or newer (uses `--env-file`)
 
 ## Setup and Start
 
+Requires Node.js 20.6 or newer.
+
 ```bash
 npm install
-npm run gen-keys          # creates keys/jwks.json (RSA 2048, kid: key-1)
+npm run gen-keys          # adds an RSA signing key to keys/jwks.json (key-1, then key-2, ...)
 cp .env.example .env      # then set COOKIES to a random value
 npm start
 ```
-
-`.env` variables:
 
 | Variable | Purpose | Example |
 |---|---|---|
 | `PORT` | Port to listen on | `3000` |
 | `ISSUER_URL` | Issuer base URL (port is appended) | `http://localhost` |
-| `COOKIES` | Comma-separated cookie signing keys (first signs, all verify) | `randomKey1,randomKey2` |
-
-Generate a cookie key:
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
-```
+| `COOKIES` | Comma-separated cookie signing keys | `randomKey1,randomKey2` |
 
 ## Endpoints
-
-With the default `.env` (`http://localhost:3000`):
 
 | Endpoint | URL |
 |---|---|
 | Discovery | http://localhost:3000/.well-known/openid-configuration |
-| JWKS (public keys only) | http://localhost:3000/jwks |
+| JWKS | http://localhost:3000/jwks |
 | Authorization | http://localhost:3000/auth |
 | Token | http://localhost:3000/token |
 | UserInfo | http://localhost:3000/me |
+| Orders API | http://localhost:3000/orders |
+| Billing API | http://localhost:3000/billing |
 
-All endpoint URLs are also listed in the discovery document.
+## Test User and Client
 
-## Test User
+| User | Password |
+|---|---|
+| `portainer` | `portainer123` |
 
-In-memory user, defined in `src/service/authenticate.js`:
-
-| Username | Password | Email | Name |
-|---|---|---|---|
-| `portainer` | `portainer123` | portainer@example.com | Portainer Io |
-
-## Configured Client
-
-Defined in `src/constants/config.js`:
-
-| Setting | Value |
+| Client setting | Value |
 |---|---|
 | `client_id` | `vin-client-1` |
 | `client_secret` | `vin-secret-1` |
 | `redirect_uri` | `https://oidcdebugger.com/debug` |
-| `response_type` | `code` |
 | `grant_types` | `authorization_code`, `refresh_token` |
-| Scopes | `openid` (gives `sub`), `email`, `profile` (gives `name`), `offline_access` |
+| Scopes | `openid`, `email`, `profile`, `offline_access`, `orders:read`, `billing:read` |
 
-## Reproduce the Login Flow (OIDC Debugger)
+## Login Flow with OIDC Debugger
 
-### 1. Start the provider
-
-```bash
-npm start
-```
-
-### 2. Request an authorization code
-
-Open https://oidcdebugger.com and fill in:
+**1.** Open https://oidcdebugger.com and fill in:
 
 | Field | Value |
 |---|---|
@@ -88,15 +66,12 @@ Open https://oidcdebugger.com and fill in:
 | Client ID | `vin-client-1` |
 | Scope | `openid email profile` |
 | Response type | `code` |
-| Response mode | `form_post` | `code_verifier` optional |
+| Response mode | `form_post` |
+| PKCE | Supported (`S256`) |
 
-### 3. Log in and consent
+**2.** Click **Send Request**, sign in as `portainer`, and click **Allow**.
 
-1. Sign in with `portainer` / `portainer123`.
-2. Click **Allow** on the consent page.
-3. OIDC Debugger shows the **authorization code**.
-
-### 4. Exchange the code for tokens
+**3.** Exchange the authorization code (valid for 60 seconds, single use):
 
 ```bash
 curl -X POST http://localhost:3000/token \
@@ -106,31 +81,56 @@ curl -X POST http://localhost:3000/token \
   -d redirect_uri=https://oidcdebugger.com/debug
 ```
 
-Add `-d code_verifier=<VERIFIER>` if PKCE was used.
+With PKCE, add `-d code_verifier=<VERIFIER>`.
 
-### 5. Call UserInfo
+**4.** Call UserInfo:
 
 ```bash
-curl http://localhost:3000/me \
-  -H "Authorization: Bearer <ACCESS_TOKEN>"
+curl http://localhost:3000/me -H "Authorization: Bearer <ACCESS_TOKEN>"
 ```
 
-Returns `sub`, `email` and `name`, based on the granted scopes.
+## Verify the ID Token on jwt.io
 
-### JWT access tokens (branch `scartch/optionals`)
+1. Paste the `id_token` into https://www.jwt.io.
+2. Copy the key from http://localhost:3000/jwks whose `kid` matches the token header.
+3. Paste it into the public key field. Result: **Signature Verified**.
+4. Change any character in the payload. Verification fails.
 
-Resource Indicators (RFC 8707) with two demo APIs, `/orders` and `/billing`. Each access token is a JWT bound to one API through `aud`, which shows how its audience differs from the ID Token's (the client).
+## Key Rotation
+
+```bash
+npm run gen-keys   # adds key-2 in front of key-1
+npm start          # restart to load the new key
+```
+
+New tokens are signed with `key-2`. `key-1` stays in `/jwks`, so older tokens still verify.
+
+## JWT Access Tokens
+
+| API | Resource | Scope | Lifetime | Signing key |
+|---|---|---|---|---|
+| Orders | `http://localhost:3000/orders` | `orders:read` | 1 hour | `key-2` |
+| Billing | `http://localhost:3000/billing` | `billing:read` | 10 minutes | `key-1` |
+
 
 ## Project Structure
 
 ```
 src/
-  server.js               Express app, mounts interaction routes and the provider
-  constants/config.js     oidc-provider config: client, claims, keys, cookies, features
-  routes/interaction.js   Login and consent routes
-  service/authenticate.js In-memory user store and findAccount
-  views/pages.js          Login and consent HTML
+  server.js               Express app, mounts interactions, demo APIs and the provider
+  constants/config.js     Provider config: client, claims, keys, cookies, resource servers
+  routes/interaction.js   Login and consent
+  routes/orders.js        Orders API
+  routes/billing.js       Billing API
+  service/authenticate.js In-memory user store
+  views/pages.js          Login and consent pages
 scripts/
-  generate-keys.js        Creates or adds an RSA signing key in keys/jwks.json
+  generate-keys.js        Adds an RSA signing key to keys/jwks.json
+  json-key-reader.js      Builds keys/jwks.json from keys/private.pem (earlier setup, overwrites jwks.json)
 keys/                     Private signing keys (git-ignored)
 ```
+
+## Production Notes
+
+In-memory storage, plain-text test credentials, file-based keys and HTTP are for local use.
+Production needs a database adapter, a secret store, a KMS for keys, HTTPS, and refresh token rotation and revocation.

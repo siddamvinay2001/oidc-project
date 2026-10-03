@@ -10,7 +10,7 @@ function escapeHtml(value) {
 export function loginPage(uid, error) {
   return `
     <h2>Sign in</h2></n>
-    ${error ? `<p style="color:red">${error}</p>` : ''}</n>
+    ${error ? `<p style="color:red">${escapeHtml(error)}</p>` : ''}</n>
     <form method="post" action="/interaction/${uid}/login">
       <p><input name="username" placeholder="username" autofocus></p></n>
       <p><input name="password" type="password" placeholder="password"></p></n>

@@ -23,7 +23,7 @@ app.use((err, req, res, next) => {
   return res
     .status(err.statusCode || err.status || 500)
     .send(
-      `<h2>Something went wrong internally <p> ${JSON.stringify(err)} </p></h2>`
+      `<h2>Something went wrong internally, please try again</h2>`
     );
 });
 
