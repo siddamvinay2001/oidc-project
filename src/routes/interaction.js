@@ -3,7 +3,6 @@ import { consentPage, loginPage } from "../views/pages.js";
 import { authenticate } from "../service/authenticate.js";
 
 export default function createInteractionRoutes(provider) {
-
   const router = express.Router();
   router.use(express.urlencoded({ extended: true }));
 
@@ -17,8 +16,8 @@ export default function createInteractionRoutes(provider) {
           consentPage(
             details.uid,
             details.params.client_id,
-            details.params.scope
-          )
+            details.params.scope,
+          ),
         );
       }
     } catch (err) {
@@ -34,8 +33,8 @@ export default function createInteractionRoutes(provider) {
         return res.send(
           loginPage(
             details.uid,
-            "User does not exists in our database, please enter valid username and password"
-          )
+            "User does not exists in our database, please enter valid username and password",
+          ),
         );
       }
       await provider.interactionFinished(
@@ -48,7 +47,7 @@ export default function createInteractionRoutes(provider) {
         },
         {
           mergeWithLastSubmission: false,
-        }
+        },
       );
     } catch (err) {
       next(err);
@@ -61,7 +60,8 @@ export default function createInteractionRoutes(provider) {
       const accountId = details.session.accountId;
       const clientId = details.params.client_id;
       const missingOIDCScope = details.prompt.details.missingOIDCScope;
-      const missingResourceScopes = details.prompt.details.missingResourceScopes;
+      const missingResourceScopes =
+        details.prompt.details.missingResourceScopes;
 
       let grant;
       if (details.grantId) {
@@ -71,9 +71,10 @@ export default function createInteractionRoutes(provider) {
         grant = new provider.Grant({ accountId, clientId });
       }
 
-      
       if (missingResourceScopes) {
-        for (const [resource, scopes] of Object.entries(missingResourceScopes)) {
+        for (const [resource, scopes] of Object.entries(
+          missingResourceScopes,
+        )) {
           grant.addResourceScope(resource, scopes.join(" "));
         }
       }
@@ -87,7 +88,7 @@ export default function createInteractionRoutes(provider) {
         req,
         res,
         { consent: { grantId } },
-        { mergeWithLastSubmission: true }
+        { mergeWithLastSubmission: true },
       );
     } catch (err) {
       next(err);

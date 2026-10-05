@@ -23,51 +23,54 @@ cp .env.example .env      # then set COOKIES to a random value
 npm start
 ```
 
-| Variable | Purpose | Example |
-|---|---|---|
-| `PORT` | Port to listen on | `3000` |
-| `ISSUER_URL` | Issuer base URL (port is appended) | `http://localhost` |
-| `COOKIES` | Comma-separated cookie signing keys | `randomKey1,randomKey2` |
+| Variable       | Purpose                                                            | Example                          |
+| -------------- | ------------------------------------------------------------------ | -------------------------------- |
+| `PORT`         | Port to listen on                                                  | `3000`                           |
+| `ISSUER_URL`   | Issuer base URL (port is appended)                                 | `http://localhost`               |
+| `COOKIES`      | Comma-separated cookie signing keys                                | `randomKey1,randomKey2`          |
+| `REDIRECT_URI` | Client redirect URI (defaults to `https://oidcdebugger.com/debug`) | `https://oidcdebugger.com/debug` |
+
+The issuer, endpoints and resource URLs below follow `ISSUER_URL` and `PORT`. They are shown with the defaults.
 
 ## Endpoints
 
-| Endpoint | URL |
-|---|---|
-| Discovery | http://localhost:3000/.well-known/openid-configuration |
-| JWKS | http://localhost:3000/jwks |
-| Authorization | http://localhost:3000/auth |
-| Token | http://localhost:3000/token |
-| UserInfo | http://localhost:3000/me |
-| Orders API | http://localhost:3000/orders |
-| Billing API | http://localhost:3000/billing |
+| Endpoint      | URL                                                    |
+| ------------- | ------------------------------------------------------ |
+| Discovery     | http://localhost:3000/.well-known/openid-configuration |
+| JWKS          | http://localhost:3000/jwks                             |
+| Authorization | http://localhost:3000/auth                             |
+| Token         | http://localhost:3000/token                            |
+| UserInfo      | http://localhost:3000/me                               |
+| Orders API    | http://localhost:3000/orders                           |
+| Billing API   | http://localhost:3000/billing                          |
 
 ## Test User and Client
 
-| User | Password |
-|---|---|
+| User        | Password       |
+| ----------- | -------------- |
 | `portainer` | `portainer123` |
 
-| Client setting | Value |
-|---|---|
-| `client_id` | `vin-client-1` |
-| `client_secret` | `vin-secret-1` |
-| `redirect_uri` | `https://oidcdebugger.com/debug` |
-| `grant_types` | `authorization_code`, `refresh_token` |
-| Scopes | `openid`, `email`, `profile`, `offline_access`, `orders:read`, `billing:read` |
+| Client setting  | Value                                                                         |
+| --------------- | ----------------------------------------------------------------------------- |
+| `client_id`     | `vin-client-1`                                                                |
+| `client_secret` | `vin-secret-1`                                                                |
+| `redirect_uri`  | `https://oidcdebugger.com/debug` (override with `REDIRECT_URI`)               |
+| `grant_types`   | `authorization_code`, `refresh_token`                                         |
+| Scopes          | `openid`, `email`, `profile`, `offline_access`, `orders:read`, `billing:read` |
 
 ## Login Flow with OIDC Debugger
 
 **1.** Open https://oidcdebugger.com and fill in:
 
-| Field | Value |
-|---|---|
-| Authorize URI | `http://localhost:3000/auth` |
-| Redirect URI | `https://oidcdebugger.com/debug` |
-| Client ID | `vin-client-1` |
-| Scope | `openid email profile` |
-| Response type | `code` |
-| Response mode | `form_post` |
-| PKCE | Supported (`S256`) |
+| Field         | Value                            |
+| ------------- | -------------------------------- |
+| Authorize URI | `http://localhost:3000/auth`     |
+| Redirect URI  | `https://oidcdebugger.com/debug` |
+| Client ID     | `vin-client-1`                   |
+| Scope         | `openid email profile`           |
+| Response type | `code`                           |
+| Response mode | `form_post`                      |
+| PKCE          | Supported (`S256`)               |
 
 **2.** Click **Send Request**, sign in as `portainer`, and click **Allow**.
 
@@ -107,11 +110,10 @@ New tokens are signed with `key-2`. `key-1` stays in `/jwks`, so older tokens st
 
 ## JWT Access Tokens
 
-| API | Resource | Scope | Lifetime | Signing key |
-|---|---|---|---|---|
-| Orders | `http://localhost:3000/orders` | `orders:read` | 1 hour | `key-2` |
-| Billing | `http://localhost:3000/billing` | `billing:read` | 10 minutes | `key-1` |
-
+| API     | Resource                        | Scope          | Lifetime   | Signing key |
+| ------- | ------------------------------- | -------------- | ---------- | ----------- |
+| Orders  | `http://localhost:3000/orders`  | `orders:read`  | 1 hour     | `key-2`     |
+| Billing | `http://localhost:3000/billing` | `billing:read` | 10 minutes | `key-1`     |
 
 ## Project Structure
 
